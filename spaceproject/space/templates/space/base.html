@@ -5,11 +5,14 @@
     <title>{{ title }}</title>
 </head>
 <body>
+{% block mainmenu %}
 <ul>
 {% for m in menu %}
     <li>{{ m }}</li>
 {% endfor %}
+{% endblock mainmenu %}
+{% block content %}
+{% endblock content %}
 </ul>
-
 </body>
 </html>

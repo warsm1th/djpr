@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 
+menu =['О сайте', "Добавить статью", "Обратная связь", "Войти"]
 
 def index(request):
-    return HttpResponse("Страница приложения space.")
+    return render(request, 'space/index.html', {'menu': menu, 'title': 'Главная страница'})
 
 
 def categories(request, catid):
