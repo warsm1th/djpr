@@ -2,11 +2,15 @@
 
 {% block content %}
 <ul class="list-articles">
-{% for p in posts %}
-    <li><div class="article-panel">
-        <p class="first">Категория: {{ p.cat }}</p>
-        <p class="last">Дата: {{ p.time_update|date:"d-m-y H:i:s" }}</p>
-    </div>
+    {% for p in posts %}
+    <li>
+        <div class="article-panel">
+            <p class="first">Категория: {{ p.cat }}</p>
+            <p class="last">Дата: {{ p.time_update|date:"d-m-y H:i:s" }}</p>
+        </div>
+        {% if p.photo %}
+        <p><img class="img-article-left thumb" src="{{ p.photo.url }}" alt="Изображение"></p>
+        {% endif %}
         <h3>{{ p.title }}</h3>
         {% autoescape off %}
         {{ p.content|linebreaks|truncatewords:40 }}
@@ -15,6 +19,6 @@
         <p class="link-read-post"><a href="{{ p.get_absolute_url }}">Читать пост</a></p>
         <hr>
     </li>
-{% endfor %}
+    {% endfor %}
 </ul>
 {% endblock content %}
