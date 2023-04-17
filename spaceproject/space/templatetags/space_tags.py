@@ -22,6 +22,7 @@ def get_menu():
     return menu
 
 
+# Вложенный тег
 @register.inclusion_tag('space/list_categories.html')
 def show_categories(sort=None, cat_selected=0):
     if sort:
