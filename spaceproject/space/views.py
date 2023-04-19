@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from .models import *
 from .forms import *
@@ -32,15 +32,16 @@ def about(request):
     return render(request, 'space/about.html', context=context)
 
 
-def addpage(request):
-    if request.method == "POST":
-        form = AddPostForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = AddPostForm()
-    return render(request, 'space/addpage.html', {'form': form, 'title': 'Добавление статьи'})
+class AddPage(CreateView):
+    form_class = AddPostForm
+    template_name = 'space/addpage.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Добавление статьи'
+
+        return context
+
 
 
 def contact(request):
@@ -51,28 +52,24 @@ def login(request):
     return HttpResponse("Авторизация")
 
 
-# def show_post(request, post_slug):
-#     post = get_object_or_404(Objects, slug=post_slug)
-#
-#     context = {
-#         'post': post,
-#         'title': post.title,
-#         'cat_selected': post.cat_id,
-#     }
-#
-#     return render(request, 'space/post.html', context=context)
-
-
 class ShowPost(DetailView):
     model = Objects
     template_name = 'space/post.html'
+    slug_url_kwarg = 'post_slug'
+    context_object_name = 'post'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = context['post'].title
+
+        return context
 
 
 class SpaceCategory(ListView):
     model = Objects
     template_name = 'space/index.html'
     context_object_name = 'posts'
-    allow_empty = False     # При отсутствии записей формируется ошибка 404
+    allow_empty = False  # При отсутствии записей формируется ошибка 404
 
     def get_queryset(self):
         return Objects.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)

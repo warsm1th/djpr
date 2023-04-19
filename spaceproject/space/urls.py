@@ -4,7 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('', SpaceHome.as_view(), name='home'),
-    path('addpage/', addpage, name='add_page'),
+    path('addpage/', AddPage.as_view(), name='add_page'),
     path('contact/', contact, name='contact'),
     path('login/', login, name='login'),
     path('about/', about, name='about'),
