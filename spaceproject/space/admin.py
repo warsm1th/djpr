@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from space.models import *
+from .models import *
 
 
 class ObjectsAdmin(admin.ModelAdmin):

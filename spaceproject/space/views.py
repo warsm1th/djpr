@@ -1,25 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import AddPostForm
 from .models import *
-from .forms import *
+from .utils import DataMixin
 
 
-class SpaceHome(ListView):
+class SpaceHome(DataMixin, ListView):
     model = Objects
     template_name = 'space/index.html'
     context_object_name = 'posts'
 
-    # extra_context = {'title': 'Главная страница'}   # Добавляем статический контекст
 
     # Функция для формирования динамического и статического контекста
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)  # Сохраняем сформированный контекст
-        # context['menu'] = menu    # Добавляем динамический контекст
-        context['title'] = 'Главная страница'
-        context['cat_selected'] = 0
-
-        return context
+        mixin_context = self.get_user_context(title='Главная страница')
+        return context | mixin_context
 
     def get_queryset(self):  # Настройка запроса из БД
         return Objects.objects.filter(is_published=True)  # Фильтруем записи из БД
@@ -32,16 +31,17 @@ def about(request):
     return render(request, 'space/about.html', context=context)
 
 
-class AddPage(CreateView):
+class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'space/addpage.html'
+    success_url = reverse_lazy('home')    # Перенаправление при успешном добавлении статьи
+    login_url = reverse_lazy('home')      # Перенаправление при отсутствии авторизации
+    raise_exception = True                # ошибка 403 "Доступ запрещен" при отсутствии авторизации
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Добавление статьи'
-
-        return context
-
+        mixin_context = self.get_user_context(title='Добавление статьи')
+        return context | mixin_context
 
 
 def contact(request):
@@ -52,7 +52,7 @@ def login(request):
     return HttpResponse("Авторизация")
 
 
-class ShowPost(DetailView):
+class ShowPost(DataMixin ,DetailView):
     model = Objects
     template_name = 'space/post.html'
     slug_url_kwarg = 'post_slug'
@@ -60,12 +60,11 @@ class ShowPost(DetailView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = context['post'].title
+        mixin_context = self.get_user_context(title=context["post"])
+        return context | mixin_context
 
-        return context
 
-
-class SpaceCategory(ListView):
+class SpaceCategory(DataMixin ,ListView):
     model = Objects
     template_name = 'space/index.html'
     context_object_name = 'posts'
@@ -76,10 +75,9 @@ class SpaceCategory(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
-        context['title'] = 'Категория - ' + str(context['posts'][0].cat)
-        context['cat_selected'] = context['posts'][0].cat_id
-
-        return context
+        title = 'Категория - ' + str(context['posts'][0].cat)
+        mixin_context = self.get_user_context(title=title, cat_selected=context['posts'][0].cat_id)
+        return context | mixin_context
 
 
 def pageNotFound(request, exception):

@@ -4,7 +4,7 @@ from space.models import *
 register = template.Library()  # Экземляр класса, через который происходит регистрация собственных тегов
 
 
-# Образец простого тега с принимаемым аргументом
+# Образец простого тега с принимаемым аргументом(не используется)
 @register.simple_tag(name='getcats')  # С помощью декоратора передаем функцию в тег
 def get_categories(filter=None):
     if filter:
@@ -12,7 +12,7 @@ def get_categories(filter=None):
     else:
         return Category.objects.all()
 
-
+#(не используется)
 @register.simple_tag(name='menu')
 def get_menu():
     menu = [{'title': 'О сайте', 'url_name': 'about'},
@@ -22,7 +22,7 @@ def get_menu():
     return menu
 
 
-# Вложенный тег
+# Вложенный тег(не используется)
 @register.inclusion_tag('space/list_categories.html')
 def show_categories(sort=None, cat_selected=0):
     if sort:
