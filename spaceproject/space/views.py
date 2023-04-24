@@ -5,7 +5,8 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import AddPostForm
 from .models import *
-from .utils import DataMixin
+from .utils import *
+from django.core.paginator import Paginator
 
 
 class SpaceHome(DataMixin, ListView):
@@ -25,10 +26,12 @@ class SpaceHome(DataMixin, ListView):
 
 
 def about(request):
-    context = {
-        'title': "О сайте"
-    }
-    return render(request, 'space/about.html', context=context)
+    contact_list = Objects.objects.all()
+    paginator = Paginator(contact_list, 3)
+
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    return render(request, 'space/about.html', {'page_obj': page_object, 'menu': menu, 'title': 'О сайте'})
 
 
 class AddPage(LoginRequiredMixin, DataMixin, CreateView):
@@ -52,7 +55,7 @@ def login(request):
     return HttpResponse("Авторизация")
 
 
-class ShowPost(DataMixin ,DetailView):
+class ShowPost(DataMixin, DetailView):
     model = Objects
     template_name = 'space/post.html'
     slug_url_kwarg = 'post_slug'
@@ -64,7 +67,7 @@ class ShowPost(DataMixin ,DetailView):
         return context | mixin_context
 
 
-class SpaceCategory(DataMixin ,ListView):
+class SpaceCategory(DataMixin, ListView):
     model = Objects
     template_name = 'space/index.html'
     context_object_name = 'posts'
