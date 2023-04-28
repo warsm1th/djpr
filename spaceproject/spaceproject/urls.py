@@ -23,6 +23,7 @@ from spaceproject import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('space.urls')),
+    path('captcha', include('captcha.urls')),
 ]
 
 if settings.DEBUG:
