@@ -1,0 +1,19 @@
+#header, .module caption {
+    background: #133826;
+}
+
+div.breadcrumbs {
+    background: #aed1c0;
+}
+
+.module h2 {
+    background: #133826;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+    background: #133826;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #133826;
+}
